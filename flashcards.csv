@@ -1,0 +1,6 @@
+side1,side2,side3,side4,side5,correct,incorrect,prev_corr
+cat,ねこ,neko,猫,,3,0,True
+dog,いぬ,inu,犬,,3,0,True
+chair,いす,isu,椅子,,2,1,True
+desk,つくえ,tsukue,机,,3,0,True
+to eat,たべる,taberu,食べる,,2,1,True
