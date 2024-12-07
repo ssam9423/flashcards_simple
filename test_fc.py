@@ -1,6 +1,5 @@
-# Hot key to run is CTRL + F5
-
 # Simple Flashcard Tester - Samantha Song - started 2024.12.05
+# Updated: 2024.10.06
 # Tests all flashcards and updates/records # of times correct/incorrect
 # Takes in a CSV file with at least 5 columns:
 #   side1 - side of the flashcard
@@ -18,23 +17,28 @@ import pandas as pd
 
 # # Global Variables
 db = pd.read_csv('flashcards.csv')
-print(db) 
-time_delay = 0.25
+rows = db.shape[0] # Number of Rows - Number of flashcards
+columns = db.shape[1] # Number of Columns - Number of sides + 3 (corr, incorr, prev_corr)
 
+# ************************************************************************************
+# EDITABLE VARIABLES
 # Sets range of flashcards to test
 start_ind = 0
-end_ind = db.shape[0]
-ids = range(start_ind, end_ind)
-
+end_ind = rows
 # Sets the front and back of flashcards via sides (side1, side2, etc)
-fc_front = [0]
-fc_back = [1]
+fc_front = [0, 3]
+fc_back = [1, 3]
+# Sets the time delay between when button presses are processed
+time_delay = 0.25
+# ************************************************************************************
 
 # Flashcards - Last 3 columns must always be correct, incorrect, and prev_corr
-corr = db.shape[0] - 3
-incorr = db.shape[0] - 2
-prev_corr = db.shape[0] -1
+corr = columns - 3
+incorr = columns - 2
+prev_corr = columns -1
 
+# Range of flashcards to test
+ids = range(start_ind, end_ind)
 
 # Tests all flashcards based on test_ids and test_set
 def test_all(test_ids, test_set, front, back):
@@ -48,6 +52,7 @@ def test_all(test_ids, test_set, front, back):
     # Start on front side f
     front_side = True
     while num_test <= len(test_ids):
+        print("-------------------------------------")
         # Allows tester to fix previous mistake if not the first card
         if num_test > 0:
             print("Press \'b\' to return to previous flashcard.\n")
@@ -62,12 +67,12 @@ def test_all(test_ids, test_set, front, back):
                 # If tester made a mistake on the previous FC
                 # Index will automatically be last index - has not yet been updated
                 if keyboard.is_pressed('b'):
-                    print("Showing the previous flashcard")
-                    prev_prev_corr = test_set[index][prev_corr]
+                    print("Showing the previous flashcard.")
+                    prev_prev_corr = test_set.iloc[index, prev_corr]
                     if prev_prev_corr == True:
-                        test_set[index][corr] -= 1
+                        test_set.iloc[index, corr] -= 1
                     else:
-                        test_set[index][incorr] -= 1
+                        test_set.iloc[index, incorr] -= 1
                     num_test -= 1
                     front_side = True
                     break
@@ -82,16 +87,15 @@ def test_all(test_ids, test_set, front, back):
         # Prints Front Side
         if front_side == True:
             for side in front:
-                print(str(test_set[index][side]))
+                print(str(test_set.iloc[index, side]))
         # Prints Back Side
         else:
             for side in back:
-                print(str(test_set[index][side]))
+                print(str(test_set.iloc[index, side]))
         print("\nPress \'f\' if you were incorrect.")
         print("Press \'j\' if you were correct.")
         print("\nPress the SPACE BAR to flip the card.")
-        print("\nTo end the session, press \'q\'")
-        print("\n\n")
+        print("Press \'q\' to end the session.\n")
 
         # Wait on each flashcard until tester gets them correct or incorrect
         time.sleep(time_delay)
@@ -101,22 +105,22 @@ def test_all(test_ids, test_set, front, back):
                 return 3
             # If tester made a mistake on the previous FC
             if keyboard.is_pressed('b') and num_test > 0:
-                print("Showing the previous flashcard")
+                print("Showing the previous flashcard.")
                 prev_index = index - 1
-                prev_prev_corr = test_set[prev_index][prev_corr]
+                prev_prev_corr = test_set.iloc[prev_index, prev_corr]
                 if prev_prev_corr == True:
-                    test_set[prev_index][corr] -= 1
+                    test_set.iloc[prev_index, corr] -= 1
                 else:
-                    test_set[prev_index][incorr] -= 1
+                    test_set.iloc[prev_index, incorr] -= 1
                 num_test -= 1
                 front_side = True
                 break
             # Tester gets the flashcard Incorrect
             if keyboard.is_pressed('f'):
-                print("You got this flashcard incorrect")
+                print("You got this flashcard incorrect.")
                 # Update Incorrect and Last Correct
-                test_set[index][incorr] += 1
-                test_set[index][prev_corr] = False
+                test_set.iloc[index, incorr] += 1
+                test_set.iloc[index, prev_corr] = False
                 num_test += 1
                 front_side = True
                 break
@@ -124,8 +128,8 @@ def test_all(test_ids, test_set, front, back):
             if keyboard.is_pressed('j'):
                 print("You got this flashcard correct!")
                 # Update Correct and Last Correct
-                test_set[index][corr] += 1
-                test_set[index][prev_corr] = True
+                test_set.iloc[index, corr] += 1
+                test_set.iloc[index, prev_corr] = True
                 num_test += 1
                 front_side = True
                 break
@@ -135,12 +139,15 @@ def test_all(test_ids, test_set, front, back):
                 break
         # Print both sides?
     # Once all FC have been tested - finish test session
-    print("You have completed all the flashcards in this set.")
+    print("-------------------------------------")
+    print("\nYou have completed all the flashcards in this set.")
     return 2
 
 
 # Tests flashcards
 test_all(ids, db, fc_front, fc_back)
 
+#print(db)
+
 # Write updated data to new csv
-db.to_csv('flashcards.csv')
+db.to_csv('flashcards.csv', index=False) 
