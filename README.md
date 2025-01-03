@@ -23,10 +23,13 @@ The CSV file requires at least 5 columns:
 >By default, the program assumes that there are column names. Thus, the first row will not be tested.
 
 ## Adapting the Code
-In the code, update the file name to the desired CSV file name ```db = pd.read_csv('<filename>.csv')```.\
-To test a subsection of the flashcards, the ```start_ind``` and ```end_ind``` can be updated. Both should be an integer smaller than the amount of flashcards in the CSV file.\
+In the code, update the file name to the desired CSV file name ```db = pd.read_csv('<filename>.csv')```.
+
+To test a subsection of the flashcards, the ```start_ind``` and ```end_ind``` can be updated. Both should be an integer smaller than the amount of flashcards in the CSV file.
+
 If there are more than 2 sides to the flashcards, the sides that show up on the front and back of the flashcards can be adjusted by changing the lists ```fc_front``` and ```fc_back```.
-The list of integers are the indexes for the columns in the CSV file.\
+The list of integers are the indexes for the columns in the CSV file.
+
 The delay between button presses can also be adjusted by changing the ```time_delay``` variable.
 
 ```
